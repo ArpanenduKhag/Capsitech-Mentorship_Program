@@ -32,9 +32,8 @@ if not os.path.exists(MODEL_PATH):
 st.title("Speech Recognition from Uploaded Audio with Vosk")
 
 # Load the Vosk Model
-if not os.path.exists(MODEL_PATH):
-    st.error("Please download the Vosk model and place it in the 'model' folder!")
-    st.stop()
+model = Model(MODEL_PATH)
+st.write("Model loaded successfully!")
 
 model = Model(MODEL_PATH)
 
