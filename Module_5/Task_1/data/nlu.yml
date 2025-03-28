@@ -1,0 +1,24 @@
+version: "3.1"
+
+nlu:
+  - intent: greet
+    examples: |
+      - Hello
+      - Hi there!
+      - Hey
+      - Good morning
+      - Good evening
+
+  - intent: goodbye
+    examples: |
+      - Bye
+      - See you later
+      - Goodbye
+      - Have a nice day!
+
+  - intent: search_restaurant
+    examples: |
+      - I want to find a restaurant
+      - Can you suggest a place to eat?
+      - Find me a Chinese restaurant
+      - Show me Italian restaurants nearby
