@@ -1,27 +1,29 @@
-# This files contains your custom actions which can be used to run
-# custom Python code.
-#
-# See this guide on how to implement these action:
-# https://rasa.com/docs/rasa/custom-actions
+from typing import Any, Text, Dict, List
+from rasa_sdk import Action, Tracker
+from rasa_sdk.executor import CollectingDispatcher
 
 
-# This is a simple example for a custom action which utters "Hello World!"
+class ActionSearchRestaurant(Action):
+    def name(self) -> Text:
+        return "action_search_restaurant"
 
-# from typing import Any, Text, Dict, List
-#
-# from rasa_sdk import Action, Tracker
-# from rasa_sdk.executor import CollectingDispatcher
-#
-#
-# class ActionHelloWorld(Action):
-#
-#     def name(self) -> Text:
-#         return "action_hello_world"
-#
-#     def run(self, dispatcher: CollectingDispatcher,
-#             tracker: Tracker,
-#             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-#
-#         dispatcher.utter_message(text="Hello World!")
-#
-#         return []
+    def run(
+        self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: Dict[Text, Any],
+    ) -> List[Dict[Text, Any]]:
+
+        cuisine = tracker.get_slot("cuisine")
+
+        # Dummy restaurant list
+        restaurant_list = {
+            "Chinese": ["Dragon Palace", "Golden Wok"],
+            "Italian": ["Pasta Paradise", "Little Italy"],
+        }
+
+        response = f"Here are some {cuisine} restaurants:\n"
+        response += "\n".join(restaurant_list.get(cuisine, ["No results found."]))
+
+        dispatcher.utter_message(text=response)
+        return []
