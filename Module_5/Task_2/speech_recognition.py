@@ -3,38 +3,42 @@ import wave
 import json
 import streamlit as st
 from vosk import Model, KaldiRecognizer
-
-
 import urllib.request
 import zipfile
 
+
+# Set model folder and download URL for a small Vosk model
 MODEL_PATH = "model"
+MODEL_URL = "https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip"
 
 
-def download_and_extract_model(url, extract_to):
+def download_and_extract_model(model_url, model_path):
     zip_path = "model.zip"
-    st.write("Downloading Vosk model... This may take a while.")
-    urllib.request.urlretrieve(url, zip_path)
+    st.write("Downloading Vosk model... (this may take a few minutes)")
+    urllib.request.urlretrieve(model_url, zip_path)
     st.write("Extracting model...")
     with zipfile.ZipFile(zip_path, "r") as zip_ref:
-        zip_ref.extractall(extract_to)
+        zip_ref.extractall(".")
     os.remove(zip_path)
+    # The extracted folder is likely named "vosk-model-small-en-us-0.15"
+    extracted_folder = "vosk-model-small-en-us-0.15"
+    if os.path.exists(extracted_folder):
+        os.rename(extracted_folder, model_path)
 
 
-# URL for a smaller Vosk model (adjust URL as needed)
-model_url = "https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip"
+# Check if model folder exists and contains files
+if not os.path.exists(MODEL_PATH) or not os.listdir(MODEL_PATH):
+    download_and_extract_model(MODEL_URL, MODEL_PATH)
 
-if not os.path.exists(MODEL_PATH):
-    download_and_extract_model(model_url, ".")
-
+# Try to load the model
+try:
+    model = Model(MODEL_PATH)
+    st.write("Model loaded successfully!")
+except Exception as e:
+    st.error(f"Failed to load model: {e}")
 
 # Initialize Streamlit App
 st.title("Speech Recognition from Uploaded Audio with Vosk")
-
-# Load the Vosk Model
-model = Model(MODEL_PATH)
-st.write("Model loaded successfully!")
-
 
 # File uploader for WAV files
 uploaded_file = st.file_uploader(
