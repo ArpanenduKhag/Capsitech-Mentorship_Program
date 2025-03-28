@@ -4,11 +4,34 @@ import json
 import streamlit as st
 from vosk import Model, KaldiRecognizer
 
+
+import urllib.request
+import zipfile
+
+MODEL_PATH = "model"
+
+
+def download_and_extract_model(url, extract_to):
+    zip_path = "model.zip"
+    st.write("Downloading Vosk model... This may take a while.")
+    urllib.request.urlretrieve(url, zip_path)
+    st.write("Extracting model...")
+    with zipfile.ZipFile(zip_path, "r") as zip_ref:
+        zip_ref.extractall(extract_to)
+    os.remove(zip_path)
+
+
+# URL for a smaller Vosk model (adjust URL as needed)
+model_url = "https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip"
+
+if not os.path.exists(MODEL_PATH):
+    download_and_extract_model(model_url, ".")
+
+
 # Initialize Streamlit App
 st.title("Speech Recognition from Uploaded Audio with Vosk")
 
 # Load the Vosk Model
-MODEL_PATH = "model"
 if not os.path.exists(MODEL_PATH):
     st.error("Please download the Vosk model and place it in the 'model' folder!")
     st.stop()
