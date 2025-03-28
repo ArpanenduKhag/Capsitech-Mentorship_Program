@@ -35,7 +35,6 @@ st.title("Speech Recognition from Uploaded Audio with Vosk")
 model = Model(MODEL_PATH)
 st.write("Model loaded successfully!")
 
-model = Model(MODEL_PATH)
 
 # File uploader for WAV files
 uploaded_file = st.file_uploader(
