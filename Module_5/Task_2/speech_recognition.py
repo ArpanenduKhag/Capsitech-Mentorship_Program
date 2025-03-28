@@ -1,13 +1,11 @@
 import os
-import queue
-import time
+import wave
 import json
-import pyaudio
 import streamlit as st
 from vosk import Model, KaldiRecognizer
 
 # Initialize Streamlit App
-st.title("Real-time Speech Recognition with Vosk")
+st.title("Speech Recognition from Uploaded Audio with Vosk")
 
 # Load the Vosk Model
 MODEL_PATH = "model"
@@ -17,46 +15,41 @@ if not os.path.exists(MODEL_PATH):
 
 model = Model(MODEL_PATH)
 
-# Setup Audio Stream
-audio_queue = queue.Queue()
-
-
-def callback(in_data, frame_count, time_info, status):
-    audio_queue.put(in_data)
-    return None, pyaudio.paContinue
-
-
-# Initialize PyAudio
-p = pyaudio.PyAudio()
-stream = p.open(
-    format=pyaudio.paInt16,
-    channels=1,
-    rate=16000,
-    input=True,
-    frames_per_buffer=4096,
-    stream_callback=callback,
+# File uploader for WAV files
+uploaded_file = st.file_uploader(
+    "Upload a WAV file (mono, 16-bit, 16000 Hz)", type=["wav"]
 )
+if uploaded_file is not None:
+    try:
+        wf = wave.open(uploaded_file, "rb")
+    except Exception as e:
+        st.error(f"Error reading audio file: {e}")
+    else:
+        # Check that the audio file has the correct format
+        if (
+            wf.getnchannels() != 1
+            or wf.getsampwidth() != 2
+            or wf.getframerate() != 16000
+        ):
+            st.error(
+                "Audio file must be WAV format with 1 channel, 16-bit, and 16000 Hz sample rate."
+            )
+        else:
+            # Initialize recognizer
+            recognizer = KaldiRecognizer(model, wf.getframerate())
+            transcription = ""
 
-stream.start_stream()
+            # Process the audio in chunks
+            while True:
+                data = wf.readframes(4000)
+                if len(data) == 0:
+                    break
+                if recognizer.AcceptWaveform(data):
+                    result = json.loads(recognizer.Result())
+                    transcription += result.get("text", "") + " "
+            # Get any final partial result
+            final_result = json.loads(recognizer.FinalResult())
+            transcription += final_result.get("text", "")
 
-# Recognizer
-recognizer = KaldiRecognizer(model, 16000)
-
-st.write("🎙 Speak something and see the transcription below:")
-
-transcription = st.empty()
-
-try:
-    while True:
-        audio_data = audio_queue.get()
-        if recognizer.AcceptWaveform(audio_data):
-            result = json.loads(recognizer.Result())
-            text = result.get("text", "")
-            transcription.write(f"**Recognized Speech:** {text}")
-        time.sleep(0.1)
-
-except KeyboardInterrupt:
-    st.write("Speech recognition stopped.")
-    stream.stop_stream()
-    stream.close()
-    p.terminate()
+            st.write("**Recognized Speech:**")
+            st.write(transcription)
