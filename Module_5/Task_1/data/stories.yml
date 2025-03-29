@@ -1,0 +1,23 @@
+version: "3.1"
+stories:
+  - story: restaurant search happy path
+    steps:
+      - intent: greet
+      - action: utter_greet
+      - intent: search_restaurant
+      - action: utter_ask_cuisine
+      - intent: inform
+        entities:
+          - cuisine: Italian
+      - action: utter_ask_location
+      - intent: inform
+        entities:
+          - location: New York
+      - action: action_search_restaurants
+      - action: utter_restaurant_search
+      - intent: goodbye
+      - action: utter_goodbye
+  - story: check slots
+    steps:
+      - intent: inform
+      - action: action_show_slots

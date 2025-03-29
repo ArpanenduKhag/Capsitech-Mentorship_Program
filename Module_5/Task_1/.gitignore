@@ -1,0 +1,18 @@
+# Ignore Python virtual environments
+chatbotenv/
+
+# Rasa cache and models
+.rasa/
+__pycache__/
+*.db
+*.pyc
+
+# Model files
+models/
+
+# VS Code settings (optional)
+.vscode/
+
+# OS-specific
+.DS_Store
+Thumbs.db
