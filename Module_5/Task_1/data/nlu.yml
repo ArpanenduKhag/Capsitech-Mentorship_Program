@@ -21,10 +21,11 @@ nlu:
 
   - intent: inform
     examples: |
-      - in [London](location)
-      - [London](location)
-      - I'm in [London](location)
-      - find restaurants in [London](location)
-      - [Paris](location)
-      - in [Mumbai](location)
-      - looking in [New York](location)
+      - I want [Chinese](cuisine) food
+      - I want [Indian](cuisine) food
+      - I'm craving [Mexican](cuisine) food
+      - Show me [Italian](cuisine) restaurants
+      - In [Delhi](location)
+      - I live in [Mumbai](location)
+      - Find a restaurant in [Bangalore](location)
+      - I want food in [New York](location)

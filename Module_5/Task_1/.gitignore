@@ -1,18 +1,26 @@
-# Ignore Python virtual environments
+# 🔒 Sensitive files
+credentials.yml
+
+# 🐍 Python virtual environments
+venv/
+.venv/
 chatbotenv/
 
-# Rasa cache and models
+# ⚙️ Rasa & Python cache
 .rasa/
 __pycache__/
-*.db
 *.pyc
+*.pyo
+*.db
+*.log
 
-# Model files
+# 🤖 Rasa model files
 models/
+*.tar.gz
 
-# VS Code settings (optional)
+# 📁 VS Code workspace settings
 .vscode/
 
-# OS-specific
+# 💻 OS-specific system files
 .DS_Store
 Thumbs.db
