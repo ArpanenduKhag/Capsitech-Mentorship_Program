@@ -1,9 +1,5 @@
-Module_6/Task3/__pycache__/detect.cpython-37.pyc
-Module_6/Task3/yolov8n.pt
 Module_6/Task1/yolov8n.pt
 Module_6/Task1/__pycache__/detect.cpython-37.pyc
-Module_6/Task3/HAM10000_metadata.csv
-Module_6/Task3/HAM10000_images_part_2.zip
-Module_6/Task3/HAM10000_images_part_1.zip
 Module_6/Task4/__pycache__/gesture.cpython-37.pyc
 Module_6/Task4/__pycache__/gesture.cpython-310.pyc
+Module_6/Task3/data/
