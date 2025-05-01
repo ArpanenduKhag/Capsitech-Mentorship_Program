@@ -1,0 +1,76 @@
+import os
+import json
+import streamlit as st
+from vosk import Model, KaldiRecognizer
+from streamlit_webrtc import webrtc_streamer, WebRtcMode, ClientSettings
+import av
+
+# Constants
+MODEL_PATH = "model"
+MODEL_URL = "https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip"
+
+
+# Download model if not present
+def download_model():
+    import urllib.request
+    import zipfile
+
+    zip_path = "model.zip"
+    st.write("Downloading model...")
+    urllib.request.urlretrieve(MODEL_URL, zip_path)
+    st.write("Extracting model...")
+    with zipfile.ZipFile(zip_path, "r") as zip_ref:
+        zip_ref.extractall(".")
+    os.rename("vosk-model-small-en-us-0.15", MODEL_PATH)
+    os.remove(zip_path)
+
+
+# Load model
+if not os.path.exists(MODEL_PATH):
+    download_model()
+
+model = Model(MODEL_PATH)
+
+st.title("🎤 Real-time Speech Recognition with Vosk & Streamlit")
+
+# WebRTC config
+client_settings = ClientSettings(
+    media_stream_constraints={"audio": True, "video": False},
+    rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
+)
+
+# Recognizer
+recognizer = KaldiRecognizer(model, 16000)
+
+
+# Class to process audio frames
+class AudioProcessor:
+    def __init__(self):
+        self.text = ""
+
+    def recv(self, frame: av.AudioFrame):
+        audio = frame.to_ndarray()
+        data = audio.tobytes()
+
+        if recognizer.AcceptWaveform(data):
+            result = json.loads(recognizer.Result())
+            self.text += result.get("text", "") + " "
+
+        return frame
+
+
+# Start the streamer
+ctx = webrtc_streamer(
+    key="speech",
+    mode=WebRtcMode.SENDRECV,
+    audio_processor_factory=AudioProcessor,
+    client_settings=client_settings,
+    media_stream_constraints={"audio": True, "video": False},
+)
+
+# Show recognized text
+if ctx.state.playing:
+    st.write("🎙️ **Speak now...**")
+    if hasattr(ctx.audio_processor, "text"):
+        st.write("📝 **Recognized Text:**")
+        st.markdown(ctx.audio_processor.text)
